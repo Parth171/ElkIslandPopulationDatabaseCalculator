@@ -66,10 +66,10 @@ def Database(LIST):
     CURSOR.execute("""
         CREATE TABLE
             data (
-                col_1 TEXT,
-                col_2 TEXT,
-                col_3 TEXT,
-                col_4 TEXT
+                coordinate TEXT,
+                year INT,
+                animal TEXT,
+                population INT
             )
     
     ;""")
@@ -93,13 +93,41 @@ if __name__ == "__main__":
 
     ### INPUTS
 
+    MY_LIST = []
+
+    LIST = getData(ELK_ISLAND_RAW_DATA)
+
+
+
     if FIRST_RUN:
 
         LIST = getData(ELK_ISLAND_RAW_DATA)
+
+        for i in range(len(LIST)):
+            MY_LIST.append(LIST[0])
+            MY_LIST.append(LIST[1])
+            MY_LIST.append(LIST[5])
+            MY_LIST.append(LIST[16])
+            MY_LIST[i] = MY_LIST[i].split(",")
+
+        print(MY_LIST)
+
+
         Database(LIST)
 
     else:
         print("This is not the first run")
+
+        for i in range(len(LIST)):
+            MY_LIST.append([])
+            for j in range(1):
+                MY_LIST[i].append(LIST[i][0])
+                MY_LIST[i].append(LIST[i][1])
+                MY_LIST[i].append(LIST[i][5])
+                MY_LIST[i].append(LIST[i][16])
+
+        del MY_LIST[0]
+        print(MY_LIST)
 
 
 
