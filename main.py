@@ -11,22 +11,21 @@ import sqlite3
 
 
 
-ELK_ISLAND_FILE = "Elk_Island_NP_Grassland_Forest_Ungulate_Population_1906-2017_data_reg.csv"
+ELK_ISLAND_RAW_DATA = "Elk_Island_NP_Grassland_Forest_Ungulate_Population_1906-2017_data_reg.csv"
 
-CONNECTION = sqlite3.connect(ELK_ISLAND_FILE)
-CURSOR = CONNECTION.cursor()
+DATABASE_FILE = "elk_island.db"
 
 FIRST_RUN = True
 
-if (pathlib.Path.cwd() / ELK_ISLAND_FILE).exists():
+if (pathlib.Path.cwd() / DATABASE_FILE).exists():
     FIRST_RUN = False
 
-CONNECTION = sqlite3.connect(ELK_ISLAND_FILE)
+CONNECTION = sqlite3.connect(DATABASE_FILE)
 CURSOR = CONNECTION.cursor()
 
 ## INPUTS
 
-LIST = [1, "species", "coordinate", 2006, 100]
+
 
 ### PROCESSING
 
@@ -41,7 +40,7 @@ def getData(FILENAME):
     TEXT_LIST = FILE.readlines()
     FILE.close()
 
-    for i in range(5):
+    for i in range(len(TEXT_LIST)):
         if TEXT_LIST[i][-1] == "\n":
             TEXT_LIST[i] = TEXT_LIST[i][:-1]
         TEXT_LIST[i] = TEXT_LIST[i].split(",")
@@ -50,7 +49,11 @@ def getData(FILENAME):
                 TEXT_LIST[i][j] = "None"
             if TEXT_LIST[i][j].isnumeric():
                 TEXT_LIST[i][j] = int(TEXT_LIST[i][j])
-        print(TEXT_LIST[i])
+
+    return TEXT_LIST
+
+
+
 
 def Database(LIST):
     """
@@ -58,28 +61,28 @@ def Database(LIST):
     :param LIST: list
     :return: none
     """
-
     global CURSOR, CONNECTION
 
     CURSOR.execute("""
-            CREATE TABLE
-                elk_island (
-                    id INTEGER PRIMARY KEY,
-                    species TEXT NOT NULL,
-                    coordinate TEXT NOT NULL,
-                    year INTEGER NOT NULL,
-                    population INTEGER NOT NULL
-                )
-        ;""")
-
-    CURSOR.execute("""
-        INSERT INTO
-            elk_island
-        VALUES (
-            ?,?,?,?
-        )
+        CREATE TABLE
+            data (
+                col_1 TEXT,
+                col_2 TEXT,
+                col_3 TEXT,
+                col_4 TEXT
+            )
     
-    ;""", LIST)
+    ;""")
+
+    for i in range(len(LIST)):
+        CURSOR.execute("""
+            INSERT INTO
+                data 
+            VALUES (
+                ?, ?, ?, ?
+            )
+        
+        ;""", LIST[i][:4])
 
     CONNECTION.commit()
 
@@ -90,8 +93,14 @@ if __name__ == "__main__":
 
     ### INPUTS
 
-        getData(ELK_ISLAND_FILE)
+    if FIRST_RUN:
+
+        LIST = getData(ELK_ISLAND_RAW_DATA)
         Database(LIST)
+
+    else:
+        print("This is not the first run")
+
 
 
 
