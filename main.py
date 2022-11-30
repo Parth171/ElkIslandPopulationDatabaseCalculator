@@ -46,11 +46,13 @@ def getData(FILENAME):
         TEXT_LIST[i] = TEXT_LIST[i].split(",")
         for j in range(len(TEXT_LIST[i])):
             if TEXT_LIST[i][j] == "":
-                TEXT_LIST[i][j] = "None"
+                TEXT_LIST[i][j] = "NULL"
+            if TEXT_LIST[i][j] =='NA':
+                TEXT_LIST[i][j] = "NULL"
             if TEXT_LIST[i][j].isnumeric():
                 TEXT_LIST[i][j] = int(TEXT_LIST[i][j])
 
-    return TEXT_LIST
+    return(TEXT_LIST)
 
 
 
@@ -67,22 +69,71 @@ def Database(LIST):
         CREATE TABLE
             data (
                 coordinate TEXT,
-                year INT,
-                animal TEXT,
-                population INT
+                population_year INTEGER,
+                survey_year INTEGER,
+                survey_month TEXT,
+                survey_day TEXT,
+                species_name TEXT,
+                unknown_age TEXT,
+                adult_male_count INTEGER,
+                adult_female_count INTEGER,
+                adult_unknown_count INTEGER,
+                yearling_count INTEGER,
+                calf_count INTEGER,
+                survey_total INTEGER,
+                sightability_correction_factor TEXT,
+                additional_captive_count INTEGER,
+                animals_removed_prior_to_survey INTEGER,
+                fall_population_estimate INTEGER,
+                survey_comment TEXT,
+                estimate_method TEXT
+                
             )
     
     ;""")
 
-    for i in range(len(LIST)):
+    for i in range(1, len(LIST)):
         CURSOR.execute("""
             INSERT INTO
                 data 
             VALUES (
-                ?, ?, ?, ?
+                ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
             )
-        
-        ;""", LIST[i][:4])
+
+        ;""", LIST[i][:19])
+
+
+    CONNECTION.commit()
+
+def addData():
+    """
+    Adds data to the database
+    :return:
+    """
+
+    global CURSOR, CONNECTION
+
+    USER_DATA = []
+
+    USER_DATA.append(input("North or South?: "))
+    USER_DATA.append(input("What year?: "))
+    USER_DATA.append(input("What animal?: "))
+    USER_DATA.append(input("What is the population?: "))
+
+    CURSOR.execute("""
+        INSERT INTO
+            data (
+                coordinate,
+                population_year,
+                species_name,
+                fall_population_estimate
+            )
+        VALUES (
+            ?, ?, ?, ?
+        )
+    ;""", USER_DATA)
+
+
 
     CONNECTION.commit()
 
@@ -103,31 +154,20 @@ if __name__ == "__main__":
 
         LIST = getData(ELK_ISLAND_RAW_DATA)
 
-        for i in range(len(LIST)):
-            MY_LIST.append(LIST[0])
-            MY_LIST.append(LIST[1])
-            MY_LIST.append(LIST[5])
-            MY_LIST.append(LIST[16])
-            MY_LIST[i] = MY_LIST[i].split(",")
+        print(LIST)
 
-        print(MY_LIST)
+        Database(LIST) # Creates the database
+
+        print("Database created")
 
 
-        Database(LIST)
 
     else:
         print("This is not the first run")
+        addData()  # adds data
 
-        for i in range(len(LIST)):
-            MY_LIST.append([])
-            for j in range(1):
-                MY_LIST[i].append(LIST[i][0])
-                MY_LIST[i].append(LIST[i][1])
-                MY_LIST[i].append(LIST[i][5])
-                MY_LIST[i].append(LIST[i][16])
 
-        del MY_LIST[0]
-        print(MY_LIST)
+
 
 
 
