@@ -29,6 +29,24 @@ CURSOR = CONNECTION.cursor()
 
 ### PROCESSING
 
+def menu():
+    """
+    Presents the menu to the user
+    :return: int
+    """
+
+    print("""
+    WELCOME TO ELK ISLAND CALCULATOR
+    
+    1. 
+    
+    """)
+
+    USER_INPUT
+
+
+
+
 def getData(FILENAME):
     """
     Gets the data from the file
@@ -163,6 +181,9 @@ if __name__ == "__main__":
 
 
     else:
+
+
+
         print("This is not the first run")
         addData()  # adds data
 
