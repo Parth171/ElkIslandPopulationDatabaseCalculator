@@ -52,9 +52,6 @@ def menu():
         return menu()
 
 
-
-
-
 def checkInt(INPUT):
     """
 
@@ -67,9 +64,6 @@ def checkInt(INPUT):
         print("Please enter a valid number")
         NEW_INPUT = input("Enter the number again: ")
         checkInt(NEW_INPUT)
-
-
-
 
 
 def getData(FILENAME):
@@ -146,29 +140,27 @@ def Database(LIST):
     CONNECTION.commit()
 
 
-
 def insertData(LIST):
-
     """
     Inserts new data into the list
     :param LIST: list
     :return: none
     """
-
-    LIST.append("No data has been recorded")
+    for i in range(15):
+        LIST.append("No data has been recorded")
 
     global CURSOR, CONNECTION
-
 
     CURSOR.execute(f"""
         INSERT INTO
             data (
                 coordinate,
                 population_year,
+                species_name,
+                fall_population_estimate,
                 survey_year,
                 survey_month,
                 survey_day,
-                species_name,
                 unknown_age,
                 adult_male_count,
                 adult_female_count,
@@ -179,33 +171,13 @@ def insertData(LIST):
                 sightability_correction_factor,
                 additional_captive_count,
                 animals_removed_prior_to_survey,
-                fall_population_estimate,
                 survey_comment,
                 estimate_method
             )
         VALUES (
-            {LIST[0]},
-            {LIST[1]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[2]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[4]},
-            {LIST[3]},
-            {LIST[4]},
-            {LIST[4]}  
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? 
         )
-    ;""")
-
+    ;""", LIST)
 
     CONNECTION.commit()
 
@@ -216,7 +188,6 @@ def userData():
     :return:list
     """
 
-
     USER_DATA = []
 
     USER_DATA.append(input("North or South?: "))
@@ -224,9 +195,39 @@ def userData():
     USER_DATA.append(input("What animal?: "))
     USER_DATA.append(input("What is the population?: "))
 
-
     return USER_DATA
 
+
+def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
+    """
+    Determines the population growth
+    :param START_YEAR: INT
+    :param END_YEAR: INT
+    :param USER_ANIMAL: INT
+    :return: INT
+    """
+
+    global CURSOR
+
+    if USER_ANIMAL == 1:
+        ANIMAL = "Bison"
+
+    NORTH_POPULATION = CURSOR.execute("""
+        SELECT
+            fall_population_estimate
+        FROM
+            data
+        WHERE
+            coordinate = "North" 
+        AND
+            species_name = ?
+        AND
+            population_year = ?
+    ;""", [ANIMAL, START_YEAR]).fetchone()
+
+    NORTH_POPULATION = NORTH_POPULATION[0]
+
+    print(NORTH_POPULATION)
 
 
 ### OUTPUTS
@@ -254,28 +255,25 @@ if __name__ == "__main__":
 
         while True:
 
-            #print("This is not the first run")
+            # print("This is not the first run")
             CHOICE = menu()
 
             if CHOICE == 1:
                 START_YEAR = input("Start year: ")
                 END_YEAR = input("End year: ")
+                USER_ANIMAL = int(input("Bison (1), Moose (2), Elk (3), Deer (4), All (5): "))
+
+                populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL)
 
             if CHOICE == 2:
-                pass
+                USER_DATA = userData()
+                insertData(USER_DATA)
 
             if CHOICE == 3:
                 exit()
 
-
-
-
-
-
-
-        #USER_DATA = userData()  # takes data from user
-        #insertData(USER_DATA)
-
+        # USER_DATA = userData()  # takes data from user
+        # insertData(USER_DATA)
 
     ### PROCESSING
 
