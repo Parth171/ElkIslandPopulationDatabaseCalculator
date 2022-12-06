@@ -266,6 +266,7 @@ if __name__ == "__main__":
 
             if CHOICE == 3:
                 exit()
+                print("hi")
 
 
 
