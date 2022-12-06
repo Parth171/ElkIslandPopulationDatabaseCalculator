@@ -211,8 +211,15 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
 
     if USER_ANIMAL == 1:
         ANIMAL = "Bison"
+    if USER_ANIMAL == 2:
+        ANIMAL = "Moose"
+    if USER_ANIMAL == 3:
+        ANIMAL = "Elk"
+    if USER_ANIMAL == 4:
+        ANIMAL = "Deer"
 
-    NORTH_POPULATION = CURSOR.execute("""
+
+    NORTH_POPULATION_1 = CURSOR.execute("""
         SELECT
             fall_population_estimate
         FROM
@@ -225,9 +232,72 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
             population_year = ?
     ;""", [ANIMAL, START_YEAR]).fetchone()
 
-    NORTH_POPULATION = NORTH_POPULATION[0]
+    SOUTH_POPULATION_1 = CURSOR.execute("""
+        SELECT
+            fall_population_estimate
+        FROM
+            data
+        WHERE
+            coordinate = "South" 
+        AND
+            species_name = ?
+        AND
+            population_year = ?
+    ;""", [ANIMAL, START_YEAR]).fetchone()
 
-    print(NORTH_POPULATION)
+    NORTH_POPULATION_2 = CURSOR.execute("""
+        SELECT
+            fall_population_estimate
+        FROM
+            data
+        WHERE
+            coordinate = "North" 
+        AND
+            species_name = ?
+        AND
+            population_year = ?
+    ;""", [ANIMAL, END_YEAR]).fetchone()
+
+    SOUTH_POPULATION_2 = CURSOR.execute("""
+            SELECT
+                fall_population_estimate
+            FROM
+                data
+            WHERE
+                coordinate = "South" 
+            AND
+                species_name = ?
+            AND
+                population_year = ?
+        ;""", [ANIMAL, END_YEAR]).fetchone()
+
+
+    if NORTH_POPULATION_1 is None:
+        NORTH_POPULATION_1 = 0
+    else:
+        NORTH_POPULATION_1 = NORTH_POPULATION_1[0]
+
+    if SOUTH_POPULATION_1 is None:
+        SOUTH_POPULATION_1 = 0
+    else:
+        SOUTH_POPULATION_1 = SOUTH_POPULATION_1[0]
+
+    if NORTH_POPULATION_2 is None:
+        NORTH_POPULATION_2 = 0
+    else:
+        NORTH_POPULATION_2 = NORTH_POPULATION_2[0]
+
+    if SOUTH_POPULATION_2 is None:
+        SOUTH_POPULATION_2 = 0
+    else:
+        SOUTH_POPULATION_2 = SOUTH_POPULATION_2[0]
+
+    print(NORTH_POPULATION_1)
+    print(NORTH_POPULATION_2)
+
+
+    print(SOUTH_POPULATION_1)
+    print(SOUTH_POPULATION_2)
 
 
 ### OUTPUTS
