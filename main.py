@@ -204,10 +204,13 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
     :param START_YEAR: INT
     :param END_YEAR: INT
     :param USER_ANIMAL: INT
-    :return: INT
+    :return: None
     """
 
     global CURSOR
+
+    START_YEAR = int(START_YEAR)
+    END_YEAR = int(END_YEAR)
 
     if USER_ANIMAL == 1:
         ANIMAL = "Bison"
@@ -225,12 +228,10 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
         FROM
             data
         WHERE
-            coordinate = "North" 
-        AND
-            species_name = ?
+            species_name = ? 
         AND
             population_year = ?
-    ;""", [ANIMAL, START_YEAR]).fetchone()
+    ;""", [ANIMAL, START_YEAR]).fetchall()
 
     SOUTH_POPULATION_1 = CURSOR.execute("""
         SELECT
@@ -272,10 +273,33 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
         ;""", [ANIMAL, END_YEAR]).fetchone()
 
 
+
+    WAS = NORTH_POPULATION_1[0]
+    IS = NORTH_POPULATION_1[1]
+
+    WAS = WAS[0]
+    WAS = int(WAS)
+
+    IS = IS[0]
+    IS = int(IS)
+
+
+
+    print(WAS)
+    print(IS)
+
+
+
+
+    #TOTAL_POPULATION = NORTH_POPULATION_ONE + NORTH_POPULATION_TWO
+
+
+"""
+
     if NORTH_POPULATION_1 is None:
         NORTH_POPULATION_1 = 0
     else:
-        NORTH_POPULATION_1 = NORTH_POPULATION_1[0]
+        pass #NORTH_POPULATION_1 = NORTH_POPULATION_1[0]
 
     if SOUTH_POPULATION_1 is None:
         SOUTH_POPULATION_1 = 0
@@ -292,12 +316,29 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
     else:
         SOUTH_POPULATION_2 = SOUTH_POPULATION_2[0]
 
-    print(NORTH_POPULATION_1)
-    print(NORTH_POPULATION_2)
+    TOTAL_POPULATION_START_YEAR = NORTH_POPULATION_1 + SOUTH_POPULATION_1
+
+    TOTAL_POPULATION_END_YEAR = NORTH_POPULATION_2 + SOUTH_POPULATION_2
 
 
-    print(SOUTH_POPULATION_1)
-    print(SOUTH_POPULATION_2)
+    #print(TOTAL_POPULATION_START_YEAR)
+    #print(TOTAL_POPULATION_END_YEAR)
+
+    POPULATION_GROWTH = (TOTAL_POPULATION_END_YEAR - TOTAL_POPULATION_START_YEAR) / (END_YEAR - START_YEAR)
+
+    POPULATION_GROWTH = round(POPULATION_GROWTH)
+
+"""
+
+
+    #print(f"The population growth of {ANIMAL} was {POPULATION_GROWTH}/year")
+
+
+def populationGrowthAll(START_YEAR, END_YEAR):
+
+
+    global CURSOR
+
 
 
 ### OUTPUTS
@@ -333,7 +374,10 @@ if __name__ == "__main__":
                 END_YEAR = input("End year: ")
                 USER_ANIMAL = int(input("Bison (1), Moose (2), Elk (3), Deer (4), All (5): "))
 
-                populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL)
+                if 5 > USER_ANIMAL > 0:
+                    populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL)
+                if USER_ANIMAL == 5:
+                    print("pass")
 
             if CHOICE == 2:
                 USER_DATA = userData()
