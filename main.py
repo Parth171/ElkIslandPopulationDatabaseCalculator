@@ -146,8 +146,6 @@ def insertData(LIST):
     :param LIST: list
     :return: none
     """
-    for i in range(15):
-        LIST.append("No data has been recorded")
 
     global CURSOR, CONNECTION
 
@@ -156,11 +154,10 @@ def insertData(LIST):
             data (
                 coordinate,
                 population_year,
-                species_name,
-                fall_population_estimate,
                 survey_year,
                 survey_month,
                 survey_day,
+                species_name,
                 unknown_age,
                 adult_male_count,
                 adult_female_count,
@@ -171,6 +168,7 @@ def insertData(LIST):
                 sightability_correction_factor,
                 additional_captive_count,
                 animals_removed_prior_to_survey,
+                fall_population_estimate,
                 survey_comment,
                 estimate_method
             )
@@ -188,26 +186,51 @@ def userData():
     :return:list
     """
 
+    print("""
+    Please enter the values for the following fields. 
+    If you would not like to add any data in a specific field, leave it blank. 
+    Do not leave the Area of park, population year, species name, and species population field blank. 
+    """)
+
     USER_DATA = []
 
     USER_DATA.append(input("North or South?: "))
-    USER_DATA.append(input("What year?: "))
+    USER_DATA.append(input("Population year?: "))
+    USER_DATA.append(input("Survey Year?: "))
+    USER_DATA.append(input("Survey Month?: "))
+    USER_DATA.append(input("Survey Day?: "))
     USER_DATA.append(input("What animal?: "))
+    USER_DATA.append(input("Unknown age and sex count: "))
+    USER_DATA.append(input("Adult male count: "))
+    USER_DATA.append(input("Adult female count: "))
+    USER_DATA.append(input("Adult unknown count: "))
+    USER_DATA.append(input("Yearling count: "))
+    USER_DATA.append(input("Calf count: "))
+    USER_DATA.append(input("Survey total: "))
+    USER_DATA.append(input("Sightability correction factor"))
+    USER_DATA.append(input("Additional captive count: "))
+    USER_DATA.append(input("Animals removed prior to survey: "))
     USER_DATA.append(input("What is the population?: "))
+    USER_DATA.append(input("Survey comment: "))
+    USER_DATA.append(input("Estimate method: "))
+
+    if USER_DATA[0] == "" or USER_DATA[1] == "" or USER_DATA[5] == "" or USER_DATA[16] == "":
+        print("You have not entered all the required data")
+        return userData()
+
+    for i in range(len(USER_DATA)):
+        if USER_DATA[i] == "":
+            USER_DATA[i] = "No data has been recorded"
+
+    print("Data has been successfully added to the database!")
 
     return USER_DATA
 
 
-def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
-    """
-    Determines the population growth
-    :param START_YEAR: INT
-    :param END_YEAR: INT
-    :param USER_ANIMAL: INT
-    :return: INT
-    """
 
-    global CURSOR
+def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
+
+    global CURSOR, CONNECTION
 
     if USER_ANIMAL == 1:
         ANIMAL = "Bison"
@@ -218,87 +241,20 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
     if USER_ANIMAL == 4:
         ANIMAL = "Deer"
 
-
-    NORTH_POPULATION_1 = CURSOR.execute("""
-        SELECT
-            fall_population_estimate
-        FROM
-            data
-        WHERE
-            coordinate = "North" 
-        AND
-            species_name = ?
-        AND
-            population_year = ?
-    ;""", [ANIMAL, START_YEAR]).fetchone()
-
-    SOUTH_POPULATION_1 = CURSOR.execute("""
-        SELECT
-            fall_population_estimate
-        FROM
-            data
-        WHERE
-            coordinate = "South" 
-        AND
-            species_name = ?
-        AND
-            population_year = ?
-    ;""", [ANIMAL, START_YEAR]).fetchone()
-
-    NORTH_POPULATION_2 = CURSOR.execute("""
-        SELECT
-            fall_population_estimate
-        FROM
-            data
-        WHERE
-            coordinate = "North" 
-        AND
-            species_name = ?
-        AND
-            population_year = ?
-    ;""", [ANIMAL, END_YEAR]).fetchone()
-
-    SOUTH_POPULATION_2 = CURSOR.execute("""
+        POPULATION_1 = CURSOR.execute("""
             SELECT
                 fall_population_estimate
             FROM
                 data
             WHERE
-                coordinate = "South" 
-            AND
-                species_name = ?
+                species_name= ?
             AND
                 population_year = ?
-        ;""", [ANIMAL, END_YEAR]).fetchone()
+        
+        ;""", [ANIMAL, START_YEAR]).fetchall()
 
-
-    if NORTH_POPULATION_1 is None:
-        NORTH_POPULATION_1 = 0
-    else:
-        NORTH_POPULATION_1 = NORTH_POPULATION_1[0]
-
-    if SOUTH_POPULATION_1 is None:
-        SOUTH_POPULATION_1 = 0
-    else:
-        SOUTH_POPULATION_1 = SOUTH_POPULATION_1[0]
-
-    if NORTH_POPULATION_2 is None:
-        NORTH_POPULATION_2 = 0
-    else:
-        NORTH_POPULATION_2 = NORTH_POPULATION_2[0]
-
-    if SOUTH_POPULATION_2 is None:
-        SOUTH_POPULATION_2 = 0
-    else:
-        SOUTH_POPULATION_2 = SOUTH_POPULATION_2[0]
-
-    print(NORTH_POPULATION_1)
-    print(NORTH_POPULATION_2)
-
-
-    print(SOUTH_POPULATION_1)
-    print(SOUTH_POPULATION_2)
-
+        TOTAL_POPULATION_1 = int(POPULATION_1[0]) + int(POPULATION_1[1])
+        print(TOTAL_POPULATION_1)
 
 ### OUTPUTS
 
