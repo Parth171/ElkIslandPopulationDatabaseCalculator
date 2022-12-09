@@ -251,27 +251,42 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
 
     for i in range(len(START_YEAR_POPULATION)):
         START_YEAR_POPULATION[i] = list(START_YEAR_POPULATION[i])
-        END_POPULATION.append(START_YEAR_POPULATION[i][0])
+        START_POPULATION.append(START_YEAR_POPULATION[i][0])
 
     for i in range(len(END_YEAR_POPULATION)):
         END_YEAR_POPULATION[i] = list(END_YEAR_POPULATION[i])
-        START_POPULATION.append(END_YEAR_POPULATION[i][0])
+        END_POPULATION.append(END_YEAR_POPULATION[i][0])
 
     for i in range(2):
-        END_YEAR.append(0)
-        START_YEAR.append(0)
+        END_POPULATION.append(0)
+        START_POPULATION.append(0)
 
-    print(END_POPULATION)
-    print(START_POPULATION)
+    for i in range(len(START_POPULATION)):
+        if START_POPULATION[i] == "No data has been recorded":
+            START_POPULATION[i] = 0
+
+    for i in range(len(END_POPULATION)):
+        if END_POPULATION[i] == "No data has been recorded":
+            END_POPULATION[i] = 0
+
+    TOTAL_START_YEAR = START_POPULATION[0] + START_POPULATION[1]
+    TOTAL_END_YEAR = END_POPULATION[0] + END_POPULATION[1]
+
+    print(TOTAL_START_YEAR)
+    print(TOTAL_END_YEAR)
+
+    #TOTAL_GROWTH = (TOTAL_END_YEAR - TOTAL_START_YEAR) / (END_YEAR - START_YEAR)
+
+    #print(TOTAL_GROWTH)
+
 
 
     """
 
 
-    for i in range(len(START_YEAR_POPULATION)):
-        START_YEAR_POPULATION[i] = list(START_YEAR_POPULATION[i])
-        if START_YEAR_POPULATION[i][0] == "No data has been recorded":
-            START_YEAR_POPULATION[i][0] = 0
+    for i in range(len(START_POPULATION)):
+        if START_POPULATION[i][0] == "No data has been recorded":
+            START_POPULATION[i][0] = 0
 
     for i in range(len(END_YEAR_POPULATION)):
         END_YEAR_POPULATION[i] = list(END_YEAR_POPULATION[i])
@@ -293,8 +308,7 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
     NORTH_POPULATI0N_2 = int(END_YEAR_POPULATION[0][0])
     SOUTH_POPULATION_2 = int(END_YEAR_POPULATION[1][0])
 
-    TOTAL_START_YEAR = NORTH_POPULATI0N_1 + SOUTH_POPULATION_1
-    TOTAL_END_YEAR = NORTH_POPULATI0N_2 + SOUTH_POPULATION_2
+    
 
     TOTAL_GROWTH = (TOTAL_END_YEAR - TOTAL_START_YEAR)/(END_YEAR - START_YEAR)
 
