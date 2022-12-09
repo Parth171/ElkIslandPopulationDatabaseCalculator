@@ -222,7 +222,7 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
         ANIMAL = "Deer"
 
 
-    NORTH_POPULATION_1 = CURSOR.execute("""
+    START_YEAR_POPULATION = CURSOR.execute("""
         SELECT
             fall_population_estimate
         FROM
@@ -233,105 +233,83 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
             population_year = ?
     ;""", [ANIMAL, START_YEAR]).fetchall()
 
-    SOUTH_POPULATION_1 = CURSOR.execute("""
+    END_YEAR_POPULATION = CURSOR.execute("""
         SELECT
             fall_population_estimate
         FROM
             data
         WHERE
-            coordinate = "South" 
-        AND
             species_name = ?
         AND
             population_year = ?
-    ;""", [ANIMAL, START_YEAR]).fetchone()
+    ;""", [ANIMAL, END_YEAR]).fetchall()
 
-    NORTH_POPULATION_2 = CURSOR.execute("""
-        SELECT
-            fall_population_estimate
-        FROM
-            data
-        WHERE
-            coordinate = "North" 
-        AND
-            species_name = ?
-        AND
-            population_year = ?
-    ;""", [ANIMAL, END_YEAR]).fetchone()
-
-    SOUTH_POPULATION_2 = CURSOR.execute("""
-            SELECT
-                fall_population_estimate
-            FROM
-                data
-            WHERE
-                coordinate = "South" 
-            AND
-                species_name = ?
-            AND
-                population_year = ?
-        ;""", [ANIMAL, END_YEAR]).fetchone()
+    END_POPULATION = []
+    START_POPULATION = []
 
 
 
-    WAS = NORTH_POPULATION_1[0]
-    IS = NORTH_POPULATION_1[1]
+    for i in range(len(START_YEAR_POPULATION)):
+        START_YEAR_POPULATION[i] = list(START_YEAR_POPULATION[i])
+        END_POPULATION.append(START_YEAR_POPULATION[i][0])
 
-    WAS = WAS[0]
-    WAS = int(WAS)
+    for i in range(len(END_YEAR_POPULATION)):
+        END_YEAR_POPULATION[i] = list(END_YEAR_POPULATION[i])
+        START_POPULATION.append(END_YEAR_POPULATION[i][0])
 
-    IS = IS[0]
-    IS = int(IS)
+    for i in range(2):
+        END_YEAR.append(0)
+        START_YEAR.append(0)
 
-
-
-    print(WAS)
-    print(IS)
-
-
-
-
-    #TOTAL_POPULATION = NORTH_POPULATION_ONE + NORTH_POPULATION_TWO
+    print(END_POPULATION)
+    print(START_POPULATION)
 
 
-"""
-
-    if NORTH_POPULATION_1 is None:
-        NORTH_POPULATION_1 = 0
-    else:
-        pass #NORTH_POPULATION_1 = NORTH_POPULATION_1[0]
-
-    if SOUTH_POPULATION_1 is None:
-        SOUTH_POPULATION_1 = 0
-    else:
-        SOUTH_POPULATION_1 = SOUTH_POPULATION_1[0]
-
-    if NORTH_POPULATION_2 is None:
-        NORTH_POPULATION_2 = 0
-    else:
-        NORTH_POPULATION_2 = NORTH_POPULATION_2[0]
-
-    if SOUTH_POPULATION_2 is None:
-        SOUTH_POPULATION_2 = 0
-    else:
-        SOUTH_POPULATION_2 = SOUTH_POPULATION_2[0]
-
-    TOTAL_POPULATION_START_YEAR = NORTH_POPULATION_1 + SOUTH_POPULATION_1
-
-    TOTAL_POPULATION_END_YEAR = NORTH_POPULATION_2 + SOUTH_POPULATION_2
+    """
 
 
-    #print(TOTAL_POPULATION_START_YEAR)
-    #print(TOTAL_POPULATION_END_YEAR)
+    for i in range(len(START_YEAR_POPULATION)):
+        START_YEAR_POPULATION[i] = list(START_YEAR_POPULATION[i])
+        if START_YEAR_POPULATION[i][0] == "No data has been recorded":
+            START_YEAR_POPULATION[i][0] = 0
 
-    POPULATION_GROWTH = (TOTAL_POPULATION_END_YEAR - TOTAL_POPULATION_START_YEAR) / (END_YEAR - START_YEAR)
+    for i in range(len(END_YEAR_POPULATION)):
+        END_YEAR_POPULATION[i] = list(END_YEAR_POPULATION[i])
+        if END_YEAR_POPULATION[i][0] == "No data has been recorded":
+            END_YEAR_POPULATION[i][0] = 0
 
-    POPULATION_GROWTH = round(POPULATION_GROWTH)
+    for i in range(2):
+        START_YEAR_POPULATION.append(0)
+        END_YEAR_POPULATION.append(0)
+
+   
+
+   
+
+
+    NORTH_POPULATI0N_1 = int(START_YEAR_POPULATION[0][0])
+    SOUTH_POPULATION_1 = int(START_YEAR_POPULATION[1][0])
+
+    NORTH_POPULATI0N_2 = int(END_YEAR_POPULATION[0][0])
+    SOUTH_POPULATION_2 = int(END_YEAR_POPULATION[1][0])
+
+    TOTAL_START_YEAR = NORTH_POPULATI0N_1 + SOUTH_POPULATION_1
+    TOTAL_END_YEAR = NORTH_POPULATI0N_2 + SOUTH_POPULATION_2
+
+    TOTAL_GROWTH = (TOTAL_END_YEAR - TOTAL_START_YEAR)/(END_YEAR - START_YEAR)
+
+    print(TOTAL_GROWTH)
 
 """
 
 
-    #print(f"The population growth of {ANIMAL} was {POPULATION_GROWTH}/year")
+
+
+
+
+
+
+
 
 
 def populationGrowthAll(START_YEAR, END_YEAR):
