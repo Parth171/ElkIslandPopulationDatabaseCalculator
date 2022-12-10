@@ -9,6 +9,7 @@ Date-Create: 2022-11-25
 import pathlib
 import sqlite3
 
+
 ELK_ISLAND_RAW_DATA = "Elk_Island_NP_Grassland_Forest_Ungulate_Population_1906-2017_data_reg.csv"
 
 DATABASE_FILE = "elk_island.db"
@@ -38,13 +39,14 @@ def menu():
 
     1. Search Population Growth
     2. Add to Database
-    3. Exit
+    3. View data of a specific animal during a certain year
+    4. Exit
     """)
 
     USER_INPUT = input("Select your choice: ")
     USER_INPUT = checkInt(USER_INPUT)
 
-    if 4 > USER_INPUT > 0:
+    if 5 > USER_INPUT > 0:
 
         return USER_INPUT
     else:
@@ -103,7 +105,7 @@ def Database(LIST):
     CURSOR.execute("""
         CREATE TABLE
             data (
-                coordinate TEXT,
+                area_of_park TEXT,
                 population_year INTEGER,
                 survey_year,
                 survey_month,
@@ -146,15 +148,13 @@ def insertData(LIST):
     :param LIST: list
     :return: none
     """
-    for i in range(15):
-        LIST.append("No data has been recorded")
 
     global CURSOR, CONNECTION
 
     CURSOR.execute(f"""
         INSERT INTO
             data (
-                coordinate,
+                area_of_park,
                 population_year,
                 species_name,
                 fall_population_estimate,
@@ -188,12 +188,43 @@ def userData():
     :return:list
     """
 
+    print("""
+       Please enter the values for the following fields.
+       If you would not like to add any data in a specific field, leave it blank.
+       Do not leave the Area of park, population year, species name, and species population field blank.
+       """)
+
     USER_DATA = []
 
-    USER_DATA.append(input("North or South?: "))
-    USER_DATA.append(input("What year?: "))
-    USER_DATA.append(input("What animal?: "))
+    USER_DATA.append(input("Area of Park (North or South)?: "))
+    USER_DATA.append(input("Population year?: "))
+    USER_DATA.append(input("Survey Year?: "))
+    USER_DATA.append(input("Survey Month?: "))
+    USER_DATA.append(input("Survey Day?: "))
+    USER_DATA.append(input("Species Name?: "))
+    USER_DATA.append(input("Unknown age and sex count?: "))
+    USER_DATA.append(input("Adult male count?: "))
+    USER_DATA.append(input("Adult female count?: "))
+    USER_DATA.append(input("Adult unknown count?: "))
+    USER_DATA.append(input("Yearling count?: "))
+    USER_DATA.append(input("Calf count?: "))
+    USER_DATA.append(input("Survey total?: "))
+    USER_DATA.append(input("Sightability correction factor?: "))
+    USER_DATA.append(input("Additional captive count?: "))
+    USER_DATA.append(input("Animals removed prior to survey?: "))
     USER_DATA.append(input("What is the population?: "))
+    USER_DATA.append(input("Survey comment?: "))
+    USER_DATA.append(input("Estimate method?: "))
+
+    if USER_DATA[0] == "" or USER_DATA[1] == "" or USER_DATA[5] == "" or USER_DATA[16] == "":
+        print("You have not entered all the required data")
+        return userData()
+
+    for i in range(len(USER_DATA)):
+        if USER_DATA[i] == "":
+            USER_DATA[i] = "No data has been recorded"
+
+    print("Data has been successfully added to the database!")
 
     return USER_DATA
 
@@ -248,7 +279,6 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
     START_POPULATION = []
 
 
-
     for i in range(len(START_YEAR_POPULATION)):
         START_YEAR_POPULATION[i] = list(START_YEAR_POPULATION[i])
         START_POPULATION.append(START_YEAR_POPULATION[i][0])
@@ -272,66 +302,69 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
     TOTAL_START_YEAR = START_POPULATION[0] + START_POPULATION[1]
     TOTAL_END_YEAR = END_POPULATION[0] + END_POPULATION[1]
 
-    print(TOTAL_START_YEAR)
-    print(TOTAL_END_YEAR)
+    TOTAL_GROWTH = (TOTAL_END_YEAR - TOTAL_START_YEAR) / (END_YEAR - START_YEAR)
+    TOTAL_GROWTH = round(TOTAL_GROWTH)
 
-    #TOTAL_GROWTH = (TOTAL_END_YEAR - TOTAL_START_YEAR) / (END_YEAR - START_YEAR)
+    print(f"The total growth of {ANIMAL} from {START_YEAR} to {END_YEAR} is {TOTAL_GROWTH} {ANIMAL}/year.")
 
-    #print(TOTAL_GROWTH)
-
-
-
+def allPopulationGrowth(START_YEAR, END_YEAR):
     """
-
-
-    for i in range(len(START_POPULATION)):
-        if START_POPULATION[i][0] == "No data has been recorded":
-            START_POPULATION[i][0] = 0
-
-    for i in range(len(END_YEAR_POPULATION)):
-        END_YEAR_POPULATION[i] = list(END_YEAR_POPULATION[i])
-        if END_YEAR_POPULATION[i][0] == "No data has been recorded":
-            END_YEAR_POPULATION[i][0] = 0
-
-    for i in range(2):
-        START_YEAR_POPULATION.append(0)
-        END_YEAR_POPULATION.append(0)
-
-   
-
-   
-
-
-    NORTH_POPULATI0N_1 = int(START_YEAR_POPULATION[0][0])
-    SOUTH_POPULATION_1 = int(START_YEAR_POPULATION[1][0])
-
-    NORTH_POPULATI0N_2 = int(END_YEAR_POPULATION[0][0])
-    SOUTH_POPULATION_2 = int(END_YEAR_POPULATION[1][0])
-
-    
-
-    TOTAL_GROWTH = (TOTAL_END_YEAR - TOTAL_START_YEAR)/(END_YEAR - START_YEAR)
-
-    print(TOTAL_GROWTH)
-
-"""
-
-
-
-
-
-
-
-
-
-
-
-def populationGrowthAll(START_YEAR, END_YEAR):
-
+    Calculates population growth for all populations
+    :param START_YEAR:
+    :param END_YEAR:
+    :return: None
+    """
 
     global CURSOR
 
+    START_YEAR = int(START_YEAR)
+    END_YEAR = int(END_YEAR)
 
+    START_YEAR_POPULATION = CURSOR.execute("""
+        SELECT
+            fall_population_estimate
+        FROM    
+            data
+        WHERE
+            population_year = ?
+    ;""", [START_YEAR]).fetchall()
+
+    END_YEAR_POPULATION = CURSOR.execute("""
+            SELECT
+                fall_population_estimate
+            FROM    
+                data
+            WHERE
+                population_year = ?
+        ;""", [END_YEAR]).fetchall()
+
+    START_POPULATION = []
+    END_POPULATION = []
+
+
+    for i in range(len(START_YEAR_POPULATION)):
+        START_YEAR_POPULATION[i] = list(START_YEAR_POPULATION[i])
+        START_POPULATION.append(START_YEAR_POPULATION[i][0])
+
+    for i in range(len(END_YEAR_POPULATION)):
+        END_YEAR_POPULATION[i] = list(END_YEAR_POPULATION[i])
+        END_POPULATION.append(END_YEAR_POPULATION[i][0])
+
+    for i in range(len(START_POPULATION)):
+        if START_POPULATION[i] == "No data has been recorded":
+            START_POPULATION[i] = 0
+
+    for i in range(len(END_POPULATION)):
+        if END_POPULATION[i] == "No data has been recorded":
+            END_POPULATION[i] = 0
+
+    START_TOTAL = sum(START_POPULATION)
+    END_TOTAL = sum(END_POPULATION)
+
+    TOTAL_GROWTH = (END_TOTAL - START_TOTAL)/(END_YEAR - START_YEAR)
+    TOTAL_GROWTH = round(TOTAL_GROWTH)
+
+    print(f"The total growth of all animals from {START_YEAR} to {END_YEAR} is {TOTAL_GROWTH} animals/year.")
 
 ### OUTPUTS
 
@@ -347,40 +380,35 @@ if __name__ == "__main__":
     if FIRST_RUN:
 
         LIST = getData(ELK_ISLAND_RAW_DATA)
-
         Database(LIST)  # Creates the database
 
-        print("Database created")
+    while True:
 
+        CHOICE = menu()
 
+        if CHOICE == 1:
+            START_YEAR = input("Start year: ")
+            END_YEAR = input("End year: ")
+            USER_ANIMAL = int(input("Bison (1), Moose (2), Elk (3), Deer (4), All (5): "))
 
-    else:
+            if 5 > USER_ANIMAL > 0:
+                populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL)
+            if USER_ANIMAL == 5:
+                allPopulationGrowth(START_YEAR, END_YEAR)
 
-        while True:
+        if CHOICE == 2:
+            USER_DATA = userData()
+            insertData(USER_DATA)
 
-            # print("This is not the first run")
-            CHOICE = menu()
+        if CHOICE == 3:
+            pass
 
-            if CHOICE == 1:
-                START_YEAR = input("Start year: ")
-                END_YEAR = input("End year: ")
-                USER_ANIMAL = int(input("Bison (1), Moose (2), Elk (3), Deer (4), All (5): "))
+        if CHOICE == 4:
+            exit()
 
-                if 5 > USER_ANIMAL > 0:
-                    populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL)
-                if USER_ANIMAL == 5:
-                    print("pass")
+    # USER_DATA = userData()  # takes data from user
+    # insertData(USER_DATA)
 
-            if CHOICE == 2:
-                USER_DATA = userData()
-                insertData(USER_DATA)
+### PROCESSING
 
-            if CHOICE == 3:
-                exit()
-
-        # USER_DATA = userData()  # takes data from user
-        # insertData(USER_DATA)
-
-    ### PROCESSING
-
-    ### OUTPUTS
+### OUTPUTS
