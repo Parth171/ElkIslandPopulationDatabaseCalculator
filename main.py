@@ -6,6 +6,7 @@ Author: Parth Sakpal
 Date-Create: 2022-11-25
 """
 
+
 import pathlib
 import sqlite3
 
@@ -85,9 +86,9 @@ def getData(FILENAME):
         TEXT_LIST[i] = TEXT_LIST[i].split(",")
         for j in range(len(TEXT_LIST[i])):
             if TEXT_LIST[i][j] == "":
-                TEXT_LIST[i][j] = "No data has been recorded"
+                TEXT_LIST[i][j] = "NA"
             if TEXT_LIST[i][j] == 'NA':
-                TEXT_LIST[i][j] = "No data has been recorded"
+                TEXT_LIST[i][j] = "NA"
             if TEXT_LIST[i][j].isnumeric():
                 TEXT_LIST[i][j] = int(TEXT_LIST[i][j])
 
@@ -222,7 +223,7 @@ def userData():
 
     for i in range(len(USER_DATA)):
         if USER_DATA[i] == "":
-            USER_DATA[i] = "No data has been recorded"
+            USER_DATA[i] = "NA"
 
     print("Data has been successfully added to the database!")
 
@@ -366,6 +367,88 @@ def allPopulationGrowth(START_YEAR, END_YEAR):
 
     print(f"The total growth of all animals from {START_YEAR} to {END_YEAR} is {TOTAL_GROWTH} animals/year.")
 
+
+def viewData(YEAR, USER_ANIMAL):
+    """
+    View the data of an animal from a specific year
+    :return: None
+    """
+
+    if USER_ANIMAL == 1:
+        ANIMAL = "Bison"
+    if USER_ANIMAL == 2:
+        ANIMAL = "Moose"
+    if USER_ANIMAL == 3:
+        ANIMAL = "Elk"
+    if USER_ANIMAL == 4:
+        ANIMAL = "Deer"
+
+
+    global CURSOR
+
+    DATA = CURSOR.execute("""
+        SELECT
+            *
+        FROM 
+            data
+        WHERE
+            population_year = ?
+        AND
+            species_name = ?  
+    ;""", [YEAR, ANIMAL]).fetchall()
+
+
+
+
+    print("| Area of park | Population Year | Survey Year | Survey Month | Survey Day | Species name | Unknown age and sex count | Adult male count | Adult female count | Adult unknown count | Yearling count | Calf count | Survey total | Sightability correction factor | Additional captive count | Animals removed prior to survey | Fall population estimate | Any additional survey comments | Estimate method | ")
+
+    for i in range(len(DATA)):
+        DATA[i] = list(DATA[i])
+        print("|", DATA[i][0], " "*(11-len(DATA[i][0])), "|",
+              DATA[i][1], " "*(14-len(str(DATA[i][1]))), "|",
+              DATA[i][2], " "*(10-len(str(DATA[i][2]))), "|",
+              DATA[i][3], " "*(11-len(str(DATA[i][3]))), "|",
+              DATA[i][4], " "*(9-len(str(DATA[i][4]))), "|",
+              DATA[i][5], " "*(11-len(DATA[i][5])), "|",
+              DATA[i][6], " "*(24-len(str(DATA[i][6]))), "|",
+              DATA[i][7], " "*(15-len(str(DATA[i][7]))), "|",
+              DATA[i][8], " "*(17-len(str(DATA[i][8]))), "|",
+              DATA[i][9], " "*(18-len(str(DATA[i][9]))), "|",
+              DATA[i][10], " "*(13-len(str(DATA[i][10]))), "|",
+              DATA[i][11], " "*(9-len(str(DATA[i][11]))), "|",
+              DATA[i][12], " "*(11-len(str(DATA[i][12]))), "|",
+              DATA[i][13], " "*(29-len(str(DATA[i][13]))), "|",
+              DATA[i][14], " "*(23-len(str(DATA[i][14]))), "|",
+              DATA[i][15], " "*(30-len(str(DATA[i][15]))), "|",
+              DATA[i][16], " "*(23-len(str(DATA[i][16]))), "|",
+              DATA[i][17], " "*(29-len(str(DATA[i][17]))), "|",
+              DATA[i][18], " "*(14-len(str(DATA[i][18]))), "|")
+
+"""
+                area_of_park,
+                population_year,
+                species_name,
+                fall_population_estimate,
+                survey_year,
+                survey_month,
+                survey_day,
+                unknown_age,
+                adult_male_count,
+                adult_female_count,
+                adult_unknown_count,
+                yearling_count,
+                calf_count,
+                survey_total,
+                sightability_correction_factor,
+                additional_captive_count,
+                animals_removed_prior_to_survey,
+                survey_comment,
+                estimate_method
+
+"""
+
+
+
 ### OUTPUTS
 
 
@@ -401,7 +484,8 @@ if __name__ == "__main__":
             insertData(USER_DATA)
 
         if CHOICE == 3:
-            pass
+            print("View all data of an animal from a specific year")
+            viewData(2000, 1)
 
         if CHOICE == 4:
             exit()
