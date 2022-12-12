@@ -34,7 +34,7 @@ def menu():
 
     print("""
     WELCOME TO ELK ISLAND CALCULATOR.
-    This program will allow you to determine the growth rate of animals from a specfic year. 
+    This program will allow you to determine the growth rate of animals from a specific year. 
 
     1. Search Population Growth
     2. Add to Database
