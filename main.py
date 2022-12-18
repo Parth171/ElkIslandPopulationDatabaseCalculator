@@ -6,7 +6,7 @@ Author: Parth Sakpal
 Date-Create: 2022-11-25
 """
 
-
+## Imports
 import pathlib
 import sqlite3
 
@@ -17,6 +17,7 @@ DATABASE_FILE = "elk_island.db"
 
 FIRST_RUN = True
 
+# Checks to see if database file already exists
 if (pathlib.Path.cwd() / DATABASE_FILE).exists():
     FIRST_RUN = False
 
@@ -26,9 +27,6 @@ CURSOR = CONNECTION.cursor()
 
 ## INPUTS
 
-
-### PROCESSING
-
 def menu():
     """
     Presents the menu to the user
@@ -36,7 +34,8 @@ def menu():
     """
 
     print("""
-    WELCOME TO ELK ISLAND CALCULATOR
+    WELCOME TO ELK ISLAND CALCULATOR.
+    This program will allow you to determine the growth rate of animals from a specific year. 
 
     1. Search Population Growth
     2. Add to Database
@@ -44,30 +43,37 @@ def menu():
     4. Exit
     """)
 
+    # Checks to see if the inputed value is a number
     USER_INPUT = input("Select your choice: ")
-    USER_INPUT = checkInt(USER_INPUT)
+    if USER_INPUT.isnumeric() is False:
+        print("Enter a number value.")
+        return menu()
 
+    USER_INPUT = int(USER_INPUT)
+
+    # Checks to see if the option selected is present in the menu
     if 5 > USER_INPUT > 0:
-
         return USER_INPUT
     else:
         print("Select an option from the menu")
         return menu()
 
-
-def checkInt(INPUT):
+def userAnimal():
+    """
+    Allows user to input the animal they want to calculate the growth rate for.
+    :return: Int
     """
 
-    :return:
-    """
+    USER_ANIMAL = int(input("Bison (1), Moose (2), Elk (3), Deer (4), All (5): "))
 
-    if INPUT.isnumeric():
-        return int(INPUT)
+    # Checks to see if the option selected is present in the menu
+    if 0 > USER_ANIMAL or USER_ANIMAL > 5:
+        print("Enter an option from the list provided.")
+        return userAnimal()
     else:
-        print("Please enter a valid number")
-        NEW_INPUT = input("Enter the number again: ")
-        checkInt(NEW_INPUT)
+        return USER_ANIMAL
 
+## PROCESSING
 
 def getData(FILENAME):
     """
@@ -82,7 +88,7 @@ def getData(FILENAME):
 
     for i in range(len(TEXT_LIST)):
         if TEXT_LIST[i][-1] == "\n":
-            TEXT_LIST[i] = TEXT_LIST[i][:-1]
+            TEXT_LIST[i] = TEXT_LIST[i][:-1] # Removes the /n from the end of each line
         TEXT_LIST[i] = TEXT_LIST[i].split(",")
         for j in range(len(TEXT_LIST[i])):
             if TEXT_LIST[i][j] == "":
@@ -99,7 +105,7 @@ def Database(LIST):
     """
     Creates the database
     :param LIST: list
-    :return: none
+    :return: None
     """
     global CURSOR, CONNECTION
 
@@ -145,9 +151,9 @@ def Database(LIST):
 
 def insertData(LIST):
     """
-    Inserts new data into the list
+    Inserts new data into the database.
     :param LIST: list
-    :return: none
+    :return: None
     """
 
     global CURSOR, CONNECTION
@@ -185,8 +191,8 @@ def insertData(LIST):
 
 def userData():
     """
-    Adds data to the database
-    :return:list
+    Allows user to input the values they want to add to the database
+    :return:List
     """
 
     print("""
@@ -217,6 +223,7 @@ def userData():
     USER_DATA.append(input("Survey comment?: "))
     USER_DATA.append(input("Estimate method?: "))
 
+    # Checks to see if all required fields are filled in
     if USER_DATA[0] == "" or USER_DATA[1] == "" or USER_DATA[5] == "" or USER_DATA[16] == "":
         print("You have not entered all the required data")
         return userData()
@@ -293,11 +300,11 @@ def populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL):
         START_POPULATION.append(0)
 
     for i in range(len(START_POPULATION)):
-        if START_POPULATION[i] == "No data has been recorded":
+        if START_POPULATION[i] == "NA":
             START_POPULATION[i] = 0
 
     for i in range(len(END_POPULATION)):
-        if END_POPULATION[i] == "No data has been recorded":
+        if END_POPULATION[i] == "NA":
             END_POPULATION[i] = 0
 
     TOTAL_START_YEAR = START_POPULATION[0] + START_POPULATION[1]
@@ -352,11 +359,11 @@ def allPopulationGrowth(START_YEAR, END_YEAR):
         END_POPULATION.append(END_YEAR_POPULATION[i][0])
 
     for i in range(len(START_POPULATION)):
-        if START_POPULATION[i] == "No data has been recorded":
+        if START_POPULATION[i] == "NA":
             START_POPULATION[i] = 0
 
     for i in range(len(END_POPULATION)):
-        if END_POPULATION[i] == "No data has been recorded":
+        if END_POPULATION[i] == "NA":
             END_POPULATION[i] = 0
 
     START_TOTAL = sum(START_POPULATION)
@@ -370,7 +377,7 @@ def allPopulationGrowth(START_YEAR, END_YEAR):
 
 def viewData(YEAR, USER_ANIMAL):
     """
-    View the data of an animal from a specific year
+    View the data of an animal from a specific year in a table
     :return: None
     """
 
@@ -399,6 +406,7 @@ def viewData(YEAR, USER_ANIMAL):
 
 
 
+    # Makes a simple table using for loops for the user to view the data
 
     print("| Area of park | Population Year | Survey Year | Survey Month | Survey Day | Species name | Unknown age and sex count | Adult male count | Adult female count | Adult unknown count | Yearling count | Calf count | Survey total | Sightability correction factor | Additional captive count | Animals removed prior to survey | Fall population estimate | Any additional survey comments | Estimate method | ")
 
@@ -424,39 +432,12 @@ def viewData(YEAR, USER_ANIMAL):
               DATA[i][17], " "*(29-len(str(DATA[i][17]))), "|",
               DATA[i][18], " "*(14-len(str(DATA[i][18]))), "|")
 
-"""
-                area_of_park,
-                population_year,
-                species_name,
-                fall_population_estimate,
-                survey_year,
-                survey_month,
-                survey_day,
-                unknown_age,
-                adult_male_count,
-                adult_female_count,
-                adult_unknown_count,
-                yearling_count,
-                calf_count,
-                survey_total,
-                sightability_correction_factor,
-                additional_captive_count,
-                animals_removed_prior_to_survey,
-                survey_comment,
-                estimate_method
 
-"""
-
-
-
-### OUTPUTS
 
 
 if __name__ == "__main__":
 
-    ### INPUTS
 
-    MY_LIST = []
 
     LIST = getData(ELK_ISLAND_RAW_DATA)
 
@@ -465,34 +446,36 @@ if __name__ == "__main__":
         LIST = getData(ELK_ISLAND_RAW_DATA)
         Database(LIST)  # Creates the database
 
+    # Keep runninng the program until user exits
     while True:
 
         CHOICE = menu()
 
+        # Calculate population growth
         if CHOICE == 1:
+            "Enter the start year, the end year, and the animal name to determine the growth rate of the animal."
             START_YEAR = input("Start year: ")
             END_YEAR = input("End year: ")
-            USER_ANIMAL = int(input("Bison (1), Moose (2), Elk (3), Deer (4), All (5): "))
 
-            if 5 > USER_ANIMAL > 0:
+            USER_ANIMAL = userAnimal()
+            if USER_ANIMAL < 5:
                 populationGrowth(START_YEAR, END_YEAR, USER_ANIMAL)
-            if USER_ANIMAL == 5:
+            else:
                 allPopulationGrowth(START_YEAR, END_YEAR)
 
+        # Adds data to database
         if CHOICE == 2:
             USER_DATA = userData()
             insertData(USER_DATA)
 
+        # View specific data from the database
         if CHOICE == 3:
-            print("View all data of an animal from a specific year")
-            viewData(2000, 1)
+            print("View all data of an animal from a specific year.")
+            YEAR = input("What year: ")
+            USER_INPUT = int(input("Bison (1), Moose (2), Elk (3), Deer (4): "))
+            viewData(YEAR, USER_INPUT)
 
+        # Exit the program
         if CHOICE == 4:
+            print("Thanks for using the program!")
             exit()
-
-    # USER_DATA = userData()  # takes data from user
-    # insertData(USER_DATA)
-
-### PROCESSING
-
-### OUTPUTS
