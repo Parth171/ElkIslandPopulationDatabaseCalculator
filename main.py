@@ -475,7 +475,7 @@ if __name__ == "__main__":
             USER_INPUT = int(input("Bison (1), Moose (2), Elk (3), Deer (4): "))
             viewData(YEAR, USER_INPUT)
 
-        # Exit the program
+        # Exit the program whenever the user wants to
         if CHOICE == 4:
             print("Thanks for using the program!")
             exit()
